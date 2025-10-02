@@ -100,15 +100,16 @@ Student.init({
     timestamps: true, // adds createdAt and updatedAt
 });
 //syncing model
-// (async () => {
-//   try {
-//     console.log("syncing...");
-//     await Student.sync();
-//     console.log("✅ Student table created/updated");
-//   } catch (err) {
-//     console.error("❌ Failed to create Student table:", err);
-//   }
-// })();
+(async () => {
+    try {
+        console.log("syncing...");
+        await Student.sync();
+        console.log("✅ Student table created");
+    }
+    catch (err) {
+        console.error("❌ Failed to create Student table:", err);
+    }
+})();
 //validation using joi
 exports.studentSchema = joi_1.default.object({
     firstName: joi_1.default.string().required(),

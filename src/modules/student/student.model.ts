@@ -104,15 +104,15 @@ Student.init(
   }
 );
 //syncing model
-// (async () => {
-//   try {
-//     console.log("syncing...");
-//     await Student.sync();
-//     console.log("✅ Student table created/updated");
-//   } catch (err) {
-//     console.error("❌ Failed to create Student table:", err);
-//   }
-// })();
+(async () => {
+  try {
+    console.log("syncing...");
+    await Student.sync();
+    console.log("✅ Student table created");
+  } catch (err) {
+    console.error("❌ Failed to create Student table:", err);
+  }
+})();
 
 //validation using joi
 export const studentSchema = Joi.object({
