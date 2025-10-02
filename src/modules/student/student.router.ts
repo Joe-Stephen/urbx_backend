@@ -1,9 +1,10 @@
 // routes/studentRoutes.ts
 import express from "express";
-import { addStudent } from "./student.controller";
+import { addStudent, listStudents } from "./student.controller";
 
 const studentRouter = express.Router();
 
-studentRouter.post("/addStudent", addStudent);
+studentRouter.post("/add", addStudent);
+studentRouter.get("/list", listStudents);
 
 export default studentRouter;
