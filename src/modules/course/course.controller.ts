@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import Course from "./course.model";
 import { courseSchema } from "./course.model";
 
@@ -24,19 +25,19 @@ export const createCourse = async (req: any, res: any) => {
       });
     }
     const course = await Course.create(value);
-    res.status(201).json({ success: true, data: course });
+    return res.status(201).json({ success: true, data: course });
   } catch (err: any) {
     console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
 export const getCourses = async (req: any, res: any) => {
   try {
     const courses = await Course.findAll({ where: { status: "1" } });
-    res.status(200).json({ success: true, data: courses });
+    return res.status(200).json({ success: true, data: courses });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -44,16 +45,14 @@ export const getCourseById = async (req: any, res: any) => {
   try {
     const { id } = req.query;
     const course = await Course.findByPk(id);
-
     if (!course) {
       return res
         .status(404)
         .json({ success: false, message: "Course not found" });
     }
-
-    res.status(200).json({ success: true, data: course });
+    return res.status(200).json({ success: true, data: course });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -61,17 +60,24 @@ export const updateCourse = async (req: any, res: any) => {
   try {
     const { id } = req.query;
     const course = await Course.findByPk(id);
-
     if (!course) {
       return res
         .status(404)
         .json({ success: false, message: "Course not found" });
     }
-
+    //duplicate name check
+    const duplicate = await Course.findOne({
+      where: { name: req.body.name, id: { [Op.ne]: id }, status: "1" },
+    });
+    if (duplicate) {
+      return res.status(400).json({
+        success: false,
+        message: "A course with this name already exists.",
+      });
+    }
     const { error, value } = courseSchema.validate(req.body, {
       abortEarly: false,
     });
-
     if (error) {
       return res.status(400).json({
         success: false,
@@ -79,11 +85,10 @@ export const updateCourse = async (req: any, res: any) => {
         errors: error.details.map((e) => e.message),
       });
     }
-
     await course.update(value);
-    res.status(200).json({ success: true, data: course });
+    return res.status(200).json({ success: true, data: course });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -91,18 +96,16 @@ export const deleteCourse = async (req: any, res: any) => {
   try {
     const { id } = req.query;
     const course = await Course.findByPk(id);
-
     if (!course) {
       return res
         .status(404)
         .json({ success: false, message: "Course not found" });
     }
-
     await course.destroy();
-    res
+    return res
       .status(200)
       .json({ success: true, message: "Course deleted successfully" });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
