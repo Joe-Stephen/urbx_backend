@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCourse = exports.updateCourse = exports.getCourseById = exports.getCourses = exports.createCourse = void 0;
+const sequelize_1 = require("sequelize");
 const course_model_1 = __importDefault(require("./course.model"));
 const course_model_2 = require("./course.model");
 const createCourse = async (req, res) => {
@@ -29,21 +30,21 @@ const createCourse = async (req, res) => {
             });
         }
         const course = await course_model_1.default.create(value);
-        res.status(201).json({ success: true, data: course });
+        return res.status(201).json({ success: true, data: course });
     }
     catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, message: err.message });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
 exports.createCourse = createCourse;
 const getCourses = async (req, res) => {
     try {
         const courses = await course_model_1.default.findAll({ where: { status: "1" } });
-        res.status(200).json({ success: true, data: courses });
+        return res.status(200).json({ success: true, data: courses });
     }
     catch (err) {
-        res.status(500).json({ success: false, message: err.message });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
 exports.getCourses = getCourses;
@@ -56,10 +57,10 @@ const getCourseById = async (req, res) => {
                 .status(404)
                 .json({ success: false, message: "Course not found" });
         }
-        res.status(200).json({ success: true, data: course });
+        return res.status(200).json({ success: true, data: course });
     }
     catch (err) {
-        res.status(500).json({ success: false, message: err.message });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
 exports.getCourseById = getCourseById;
@@ -72,6 +73,16 @@ const updateCourse = async (req, res) => {
                 .status(404)
                 .json({ success: false, message: "Course not found" });
         }
+        //duplicate name check
+        const duplicate = await course_model_1.default.findOne({
+            where: { name: req.body.name, id: { [sequelize_1.Op.ne]: id }, status: "1" },
+        });
+        if (duplicate) {
+            return res.status(400).json({
+                success: false,
+                message: "A course with this name already exists.",
+            });
+        }
         const { error, value } = course_model_2.courseSchema.validate(req.body, {
             abortEarly: false,
         });
@@ -83,10 +94,10 @@ const updateCourse = async (req, res) => {
             });
         }
         await course.update(value);
-        res.status(200).json({ success: true, data: course });
+        return res.status(200).json({ success: true, data: course });
     }
     catch (err) {
-        res.status(500).json({ success: false, message: err.message });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
 exports.updateCourse = updateCourse;
@@ -100,12 +111,12 @@ const deleteCourse = async (req, res) => {
                 .json({ success: false, message: "Course not found" });
         }
         await course.destroy();
-        res
+        return res
             .status(200)
             .json({ success: true, message: "Course deleted successfully" });
     }
     catch (err) {
-        res.status(500).json({ success: false, message: err.message });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
 exports.deleteCourse = deleteCourse;
