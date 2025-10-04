@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // routes/studentRoutes.ts
 const express_1 = require("express");
 const student_router_1 = __importDefault(require("./modules/student/student.router"));
+const course_router_1 = __importDefault(require("./modules/course/course.router"));
 const masterRouter = (0, express_1.Router)();
 masterRouter.use("/student", student_router_1.default);
+masterRouter.use("/course", course_router_1.default);
 exports.default = masterRouter;
